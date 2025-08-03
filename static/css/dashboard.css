@@ -1,0 +1,72 @@
+/* static/css/dashboard.css */
+
+body {
+    font-size: .875rem;
+    /* AÑADIDO: Espacio superior en todo el body para el header fijo */
+
+.dashboard-layout {
+    padding-top: 70px; /* Espacio para el header fijo */
+}
+
+/* En pantallas grandes, empujamos el footer a la derecha */
+@media (min-width: 768px) {
+    .dashboard-layout footer {
+        margin-left: 250px; /* Ancho aproximado del sidebar */
+    }
+}
+
+/* --- Barra Lateral (Sidebar) --- */
+.sidebar {
+    position: flex;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    /* AÑADIDO: Padding superior para que el contenido del sidebar empiece debajo del header */
+    padding-top: 70px;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+/* --- Contenido Principal --- */
+main {
+    padding-top: 20px;
+}
+
+/* --- CORRECCIÓN PARA EL FOOTER --- */
+/* En pantallas medianas y grandes, empujamos el footer a la derecha para que no quede debajo del sidebar */
+@media (min-width: 768px) {
+    body > footer { /* Seleccionamos el footer que es hijo directo del body */
+        /* La clase 'container' ya lo centra, pero le damos un margen para que no se pegue al sidebar */
+        margin-left: 200px; /* Ajusta este valor si el ancho de tu sidebar cambia */
+    }
+}
+
+/* --- Estilos del Sidebar (sin cambios) --- */
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #c7c7c7;
+}
+
+.sidebar .nav-link .fas {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: #8A2BE2;
+    border-radius: 5px;
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+}
+
+.card-title {
+    font-weight: 500;
+}

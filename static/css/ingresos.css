@@ -1,0 +1,13 @@
+/* static/css/ingresos.css */
+
+/* Estilo para la lista de categorías en el modal */
+#categoryList .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#categoryList .btn-delete-category {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.8rem;
+}

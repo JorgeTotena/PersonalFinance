@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Movimientos - Alivio para tu bolsillo{% endblock %}
+
+{% block styles %}
+    {{ super() }} <!-- Hereda los estilos de base.html -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Heredamos el CSS del dashboard para mantener la consistencia -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <!-- CSS específico para esta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/movimientos.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <!-- Barra Lateral de Navegación -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('movimientos') }}">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            Movimientos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('metas')}}">
+                            <i class="fas fa-bullseye me-2"></i>
+                            Metas de Ahorro
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Reportes
+                        </a>
+                    </li>
+                </ul>
+                <!-- ... resto del sidebar ... -->
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Historial de Movimientos</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button type="button" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="fas fa-plus-circle me-1"></i> Nuevo Ingreso
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-minus-circle me-1"></i> Nuevo Egreso
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros y Búsqueda -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Buscar por descripción...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="typeFilter" class="form-select">
+                                <option value="all" selected>Todos los tipos</option>
+                                <option value="ingreso">Solo Ingresos</option>
+                                <option value="egreso">Solo Egresos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="month" id="monthFilter" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Movimientos -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="movementsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Categoría</th>
+                            <th scope="col" class="text-end">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ejemplo de Ingreso -->
+                        <tr data-type="ingreso" data-date="2025-08-01">
+                            <td>01/08/2025</td>
+                            <td>Salario Mensual</td>
+                            <td><span class="badge bg-success"><i class="fas fa-briefcase me-1"></i> Salario</span></td>
+                            <td class="text-end amount-income fw-bold">+$2.500.000</td>
+                        </tr>
+                        <!-- Ejemplo de Egreso -->
+                        <tr data-type="egreso" data-date="2025-08-02">
+                            <td>02/08/2025</td>
+                            <td>Mercado del mes</td>
+                            <td><span class="badge bg-warning text-dark"><i class="fas fa-shopping-cart me-1"></i> Comida</span></td>
+                            <td class="text-end amount-expense">-$450.000</td>
+                        </tr>
+                        <!-- Ejemplo de Egreso -->
+                        <tr data-type="egreso" data-date="2025-08-03">
+                            <td>03/08/2025</td>
+                            <td>Factura de Internet</td>
+                            <td><span class="badge bg-info text-dark"><i class="fas fa-wifi me-1"></i> Servicios</span></td>
+                            <td class="text-end amount-expense">-$80.000</td>
+                        </tr>
+                         <!-- Ejemplo de Egreso -->
+                        <tr data-type="egreso" data-date="2025-08-04">
+                            <td>04/08/2025</td>
+                            <td>Transporte público</td>
+                            <td><span class="badge bg-secondary"><i class="fas fa-bus me-1"></i> Transporte</span></td>
+                            <td class="text-end amount-expense">-$60.000</td>
+                        </tr>
+                        <!-- Fila para cuando no hay resultados -->
+                        <tr id="no-results-row" style="display: none;">
+                            <td colspan="4" class="text-center text-muted">No se encontraron movimientos que coincidan con tu búsqueda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/movimientos.js') }}"></script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

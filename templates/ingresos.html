@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Añadir Ingreso - Alivio para tu bolsillo{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ingresos.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <!-- Barra Lateral de Navegación -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <!-- ... (Aquí va el mismo contenido del sidebar de tus otras páginas del dashboard) ... -->
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('movimientos') }}">
+                            <i class="fas fa-exchange-alt me-2"></i> Movimientos
+                        </a>
+                    </li>
+                    <!-- ... etc ... -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Añadir Nuevo Ingreso</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form>
+                                <!-- Campo Monto -->
+                                <div class="mb-3">
+                                    <label for="incomeAmount" class="form-label">Monto del Ingreso</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="incomeAmount" placeholder="2500000" required>
+                                    </div>
+                                </div>
+
+                                <!-- Campo Descripción -->
+                                <div class="mb-3">
+                                    <label for="incomeDescription" class="form-label">Descripción</label>
+                                    <input type="text" class="form-control" id="incomeDescription" placeholder="Ej: Salario mensual" required>
+                                </div>
+
+                                <!-- Campo Fecha -->
+                                <div class="mb-3">
+                                    <label for="incomeDate" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="incomeDate" required>
+                                </div>
+
+                                <!-- Campo Categoría -->
+                                <div class="mb-4">
+                                    <label for="incomeCategory" class="form-label">Categoría</label>
+                                    <div class="input-group">
+                                        <select class="form-select" id="incomeCategory" required>
+                                            <option selected disabled value="">Selecciona una categoría...</option>
+                                            <option value="Salario">Salario</option>
+                                            <option value="Bonos">Bonos</option>
+                                            <option value="Regalos">Regalos</option>
+                                            <option value="Ventas">Ventas</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                            <i class="fas fa-cog"></i> Gestionar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">Guardar Ingreso</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Gestionar Categorías -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="categoryModalLabel">Gestionar Categorías de Ingreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6>Añadir Nueva Categoría</h6>
+        <div class="input-group mb-3">
+          <input type="text" id="newCategoryInput" class="form-control" placeholder="Nombre de la nueva categoría">
+          <button class="btn btn-success" type="button" id="addCategoryBtn">Añadir</button>
+        </div>
+        <hr>
+        <h6>Categorías Existentes</h6>
+        <ul class="list-group" id="categoryList">
+          <!-- Las categorías se cargarán aquí con JavaScript -->
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/ingresos.js') }}"></script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

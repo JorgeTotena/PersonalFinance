@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %} Alivio para tu bolsillo {% endblock %}
+{% block content %}
+<section class="hero-section">
+        <!-- Background Shapes -->
+        <div class="hero-shape shape-1"></div>
+        <div class="hero-shape shape-2"></div>
+
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Hero Content -->
+                <div class="col-lg-6 hero-content">
+                    <h1 class="hero-title">La solución para gestionar tu dinero inteligentemente</h1>
+                    <p class="hero-subtitle">Toma el control de tus finanzas con un solo click!</p>
+
+                    <!-- CTA Buttons -->
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('signup')}}" class="btn btn-primary me-3 mb-2">Prueba gratis</a>
+                        <a href="{{ url_for('planes')}}" class="btn btn-outline mb-2">Planes<i class="fas fa-play ms-2"></i></a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="hero-stats row">
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">10K+</div>
+                                <div class="stat-label">Usuarios activos</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">98%</div>
+                                <div class="stat-label">Satisfacción</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-item">
+                                <div class="stat-number">24/7</div>
+                                <div class="stat-label">Soporte y resolución efectiva</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          <!-- Hero Image -->
+                <div class="col-lg-6 hero-image">
+                    <img src="/api/placeholder/800/600" alt="Platform Dashboard" class="hero-image-main">
+    </section>
+        <div class="secondhero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Toma el control de tus finanzas hoy con nuestra propuesta:</h1>
+                    <ul>
+                    <li class="lead mb-4">Registra tus egresos y/o ingresos diarios, semanales y mensuales y agrupalos en las categorías que tu quieras.</li>
+                    <li class="lead mb-4">Aprende a invertir y a gastar tu dinero de manera inteligente. </li>
+                    <li class="lead mb-4">Crea metas emocionales que te acerquen a tus sueños. </li>
+                    <li class="lead mb-4">Crea metas de ahorro que se ajusten a tu "talla". </li>
+                    </ul>
+
+<!--                    <a href="#" class="btn btn-light btn-lg me-2">-->
+<!--                        <i class="fab fa-apple me-2"></i>App Store-->
+<!--                    </a>-->
+<!--                    <a href="#" class="btn btn-outline-light btn-lg">-->
+<!--                        <i class="fab fa-google-play me-2"></i>Google Play-->
+<!--                    </a>-->
+                </div>
+                <div class="col-lg-6 py-4">
+                    <img class="rounded" src="https://www.semana.com/resizer/v2/R32XIQQHQVAEZF62OG4N6XKHPY.jpg?auth=cdf317eaa83bb51beb6431ed4ee66c2df6faff96608880ebdc0a690528317795&smart=true&quality=75&width=1280&height=720" alt="App Screenshot">
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+
+{% endblock %}

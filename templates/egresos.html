@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Añadir Egreso - Alivio para tu bolsillo{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/egresos.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <!-- Barra Lateral de Navegación -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <!-- ... (Aquí va el mismo contenido del sidebar de tus otras páginas del dashboard) ... -->
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('movimientos') }}">
+                            <i class="fas fa-exchange-alt me-2"></i> Movimientos
+                        </a>
+                    </li>
+                    <!-- ... etc ... -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Añadir Nuevo Egreso</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <form>
+                                <!-- Campo Monto -->
+                                <div class="mb-3">
+                                    <label for="expenseAmount" class="form-label">Monto del Egreso</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="expenseAmount" placeholder="80000" required>
+                                    </div>
+                                </div>
+
+                                <!-- Campo Descripción -->
+                                <div class="mb-3">
+                                    <label for="expenseDescription" class="form-label">Descripción</label>
+                                    <input type="text" class="form-control" id="expenseDescription" placeholder="Ej: Factura de Internet" required>
+                                </div>
+
+                                <!-- Campo Fecha -->
+                                <div class="mb-3">
+                                    <label for="expenseDate" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="expenseDate" required>
+                                </div>
+
+                                <!-- Campo Categoría -->
+                                <div class="mb-4">
+                                    <label for="expenseCategory" class="form-label">Categoría</label>
+                                    <div class="input-group">
+                                        <select class="form-select" id="expenseCategory" required>
+                                            <option selected disabled value="">Selecciona una categoría...</option>
+                                            <option value="Comida">Comida</option>
+                                            <option value="Transporte">Transporte</option>
+                                            <option value="Servicios">Servicios</option>
+                                            <option value="Ocio">Ocio</option>
+                                            <option value="Hogar">Hogar</option>
+                                            <option value="Salud">Salud</option>
+                                        </select>
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                            <i class="fas fa-cog"></i> Gestionar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-danger w-100">Guardar Egreso</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Gestionar Categorías -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="categoryModalLabel">Gestionar Categorías de Egreso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6>Añadir Nueva Categoría</h6>
+        <div class="input-group mb-3">
+          <input type="text" id="newCategoryInput" class="form-control" placeholder="Nombre de la nueva categoría">
+          <button class="btn btn-success" type="button" id="addCategoryBtn">Añadir</button>
+        </div>
+        <hr>
+        <h6>Categorías Existentes</h6>
+        <ul class="list-group" id="categoryList">
+          <!-- Las categorías se cargarán aquí con JavaScript -->
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/egresos.js') }}"></script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

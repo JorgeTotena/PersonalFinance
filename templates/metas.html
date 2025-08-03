@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Metas de Ahorro - Alivio para tu bolsillo{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/metas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <!-- Barra Lateral de Navegación -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('movimientos') }}">
+                            <i class="fas fa-exchange-alt me-2"></i> Movimientos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('metas') }}">
+                            <i class="fas fa-bullseye me-2"></i> Metas de Ahorro
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar me-2"></i> Reportes
+                        </a>
+                    </li>
+                </ul>
+                <!-- ... resto del sidebar ... -->
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Mis Metas de Ahorro</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <!-- Botón deshabilitado porque el usuario ya tiene 3 metas -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#goalModal" disabled>
+                        <i class="fas fa-plus-circle me-1"></i> Crear Nueva Meta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alerta para el límite de la versión gratuita -->
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <div>
+                    Has alcanzado el límite de 3 metas de la versión gratuita. <a href="{{ url_for('planes') }}" class="alert-link">¡Pásate a Premium</a> para crear metas ilimitadas!
+                </div>
+            </div>
+
+            <!-- Contenedor de las Metas -->
+            <div class="row">
+                <!-- Meta Card 1 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card goal-card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">✈️ Viaje a la costa</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Editar Meta</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#">Eliminar Meta</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">Ahorrado: <span class="fw-bold text-dark">$350.000</span> de $1.200.000</p>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 29%;" aria-valuenow="29" aria-valuemin="0" aria-valuemax="100">29%</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm mt-3">Añadir Ahorro</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta Card 2 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card goal-card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">📱 Nuevo Celular</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Editar Meta</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#">Eliminar Meta</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">Ahorrado: <span class="fw-bold text-dark">$1.100.000</span> de $1.800.000</p>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 61%;" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100">61%</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm mt-3">Añadir Ahorro</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta Card 3 -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card goal-card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="card-title">🎁 Regalo Mamá</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Editar Meta</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#">Eliminar Meta</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">Ahorrado: <span class="fw-bold text-dark">$425.000</span> de $500.000</p>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm mt-3">Añadir Ahorro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Crear/Editar Meta -->
+<div class="modal fade" id="goalModal" tabindex="-1" aria-labelledby="goalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="goalModalLabel">Crear Nueva Meta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="goalName" class="form-label">Nombre de la Meta</label>
+            <input type="text" class="form-control" id="goalName" placeholder="Ej: Viaje a Cartagena">
+          </div>
+          <div class="mb-3">
+            <label for="goalAmount" class="form-label">Monto Total a Ahorrar</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="goalAmount" placeholder="1200000">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary">Guardar Meta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/metas.js') }}"></script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

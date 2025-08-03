@@ -1,0 +1,21 @@
+/* static/css/metas.css */
+
+.goal-card .card-title {
+    font-weight: 600;
+}
+
+.goal-card .progress {
+    height: 1.25rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Efecto hover para las tarjetas de metas */
+.goal-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.goal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}

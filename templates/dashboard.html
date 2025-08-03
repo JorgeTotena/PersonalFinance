@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block body_class %}dashboard-layout{% endblock %}
+
+{% block title %}Dashboard - Alivio para tu bolsillo{% endblock %}
+
+{% block styles %}
+    {{ super() }} <!-- Esto hereda los estilos de base.html -->
+    <!-- Estilos específicos para el dashboard -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <!-- Barra Lateral de Navegación -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('movimientos')}}">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            Movimientos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('metas')}}">
+                            <i class="fas fa-bullseye me-2"></i>
+                            Metas de Ahorro
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Reportes
+                        </a>
+                    </li>
+                </ul>
+
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Cuenta</span>
+                </h6>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-user-circle me-2"></i>
+                            Mi Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#">
+                            <i class="fas fa-power-off me-2"></i>
+                            Cerrar sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                <a class="btn btn-sm btn-outline-primary me-2" href="{{url_for('ingresos')}}">
+                <i class="fas fa-plus-circle me-1"></i> Nuevo Ingreso</a>
+                <a class="btn btn-sm btn-outline-danger" href="{{url_for('egresos')}}">
+                <i class="fas fa-minus-circle me-1"></i> Nuevo Egreso</a>
+                </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Resumen (KPIs) -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">Ingresos del Mes</h5>
+                            <p class="card-text fs-2 fw-bold">$2.500.000</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-danger">Egresos del Mes</h5>
+                            <p class="card-text fs-2 fw-bold">$1.850.000</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-primary">Ahorro del Mes</h5>
+                            <p class="card-text fs-2 fw-bold">$650.000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico y Metas de Ahorro -->
+            <div class="row">
+                <div class="col-lg-7 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Gastos por Categoría</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Mis Metas de Ahorro (3/3)</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Meta 1 -->
+                            <h6 class="card-subtitle mb-2 text-muted">Viaje a la costa</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar" role="progressbar" style="width: 29%;" aria-valuenow="29" aria-valuemin="0" aria-valuemax="100">29%</div>
+                            </div>
+                            <!-- Meta 2 -->
+                            <h6 class="card-subtitle mb-2 text-muted">Nuevo Celular</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 61%;" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100">61%</div>
+                            </div>
+                             <!-- Meta 3 -->
+                            <h6 class="card-subtitle mb-2 text-muted">Regalo Mamá</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                            </div>
+                            <!-- Upgrade CTA -->
+                            <div class="alert alert-info text-center mt-4">
+                                ¿Quieres metas ilimitadas y presupuestos?
+                                <a href="{{ url_for('planes') }}" class="alert-link">¡Pásate a Premium!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+{% endblock %}

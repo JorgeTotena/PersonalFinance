@@ -1,0 +1,24 @@
+/* static/css/movimientos.css */
+
+/* --- Estilos para la Tabla de Movimientos --- */
+
+/* Colores para los montos */
+.amount-income {
+    color: #198754; /* Verde de Bootstrap */
+}
+
+.amount-expense {
+    color: #dc3545; /* Rojo de Bootstrap */
+}
+
+/* Efecto hover en las filas de la tabla */
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Estilo para los badges de categoría */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.4em 0.7em;
+}
