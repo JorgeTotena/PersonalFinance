@@ -44,6 +44,23 @@
                         </a>
                     </li>
                 </ul>
+                 <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Cuenta</span>
+                </h6>
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('account')}}">
+                            <i class="fas fa-user-circle me-2"></i>
+                            Mi Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#">
+                            <i class="fas fa-power-off me-2"></i>
+                            Cerrar sesión
+                        </a>
+                    </li>
+                </ul>
                 <!-- ... resto del sidebar ... -->
             </div>
         </nav>
@@ -53,12 +70,12 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Historial de Movimientos</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <button type="button" class="btn btn-sm btn-outline-primary me-2">
+                    <a class="btn btn-sm btn-outline-primary me-2" href="{{url_for('ingresos')}}">
                         <i class="fas fa-plus-circle me-1"></i> Nuevo Ingreso
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger">
+                    <a class="btn btn-sm btn-outline-danger" href="{{url_for('egresos')}}">
                         <i class="fas fa-minus-circle me-1"></i> Nuevo Egreso
-                    </button>
+                    </a>
+
                 </div>
             </div>
 

@@ -45,8 +45,13 @@ def login():
     #posts = result.scalars().all()
     return render_template("login.html")
 
-@app.route('/signup')
+@app.route('/signup', methods=["GET", "POST"])
 def signup():
+    if request.method == "POST":
+        email = request.form.get('email')
+        nombre = request.form.get('name')
+        password = request.form.get('password')
+        fecha = request.form.get('fecha')
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
     return render_template("signup.html")
