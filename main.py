@@ -45,25 +45,20 @@ with app.app_context():
 def index():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("index.html")
+    return render_template("index.html", logged_in=current_user.is_authenticated)
 
 @app.route('/planes')
 def planes():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("pricing.html")
+    return render_template("pricing.html", logged_in=current_user.is_authenticated)
 
 @app.route('/contacto')
 def contacto():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("contact.html")
+    return render_template("contact.html", logged_in=current_user.is_authenticated)
 
-@app.route('/login')
-def login():
-    # result = db.session.execute(db.select(BlogPost))
-    #posts = result.scalars().all()
-    return render_template("login.html")
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -84,40 +79,68 @@ def signup():
             return redirect(url_for('dashboard'))
     return render_template("signup.html")
 
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        # Find user by email entered.
+        result = db.session.execute(db.select(User).where(User.email == email))
+        user = result.scalar()
+
+    # Check stored password hash against entered password hashed.
+        if not user:
+            flash("Email incorrecto, intente de nuevo!.")
+            return redirect(url_for('login'))
+        elif not check_password_hash(user.password, password):
+            flash('Contraseña incorrecta, intente de nuevo.')
+            return redirect(url_for('login'))
+        else:
+            login_user(user)
+            return redirect(url_for('dashboard'))
+
+    return render_template("login.html", logged_in=current_user.is_authenticated)
+
+
+
+    # result = db.session.execute(db.select(BlogPost))
+    #posts = result.scalars().all()
+
 @app.route('/dashboard')
+@login_required
 def dashboard():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", logged_in=current_user.is_authenticated)
 
 @app.route('/cuenta')
 def account():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("account.html")
+    return render_template("account.html", logged_in=current_user.is_authenticated)
 
 @app.route('/movimientos')
 def movimientos():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("movimientos.html")
+    return render_template("movimientos.html", logged_in=current_user.is_authenticated)
 
 @app.route('/metas')
 def metas():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("metas.html")
+    return render_template("metas.html", logged_in=current_user.is_authenticated)
 
 @app.route('/ingresos')
 def ingresos():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("ingresos.html")
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated)
 
 @app.route('/egresos')
 def egresos():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("egresos.html")
+    return render_template("egresos.html", logged_in=current_user.is_authenticated)
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

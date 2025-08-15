@@ -31,10 +31,17 @@
             <input type="search" class="form-control form-control-dark" placeholder="Buscar..." aria-label="Search">
           </form>
 
+          {% if not logged_in: %}
           <div class="text-end">
             <a class="btn btn-outline-light me-2" href="{{ url_for('login')}}">Iniciar sesión</a>
             <a class="btn btn-primary" href="{{ url_for('signup')}}">Registrarse</a>
           </div>
+          {% else %}
+          <div class="text-end">
+            <a class="btn btn-primary" href="{{ url_for('login')}}"> Cerrar sesión</a>
+          </div>
+          {% endif %}
+
         </div>
       </div>
     </header>
