@@ -132,10 +132,12 @@
       </div>
       <div class="modal-body">
         <h6>Añadir Nueva Categoría</h6>
+        <form action="{{ url_for('categorias_egresos') }}" method="post" novalidate>
         <div class="input-group mb-3">
-          <input type="text" id="newCategoryInput" class="form-control" placeholder="Nombre de la nueva categoría">
-          <button class="btn btn-success" type="button" id="addCategoryBtn">Añadir</button>
+          <input type="text" id="newCategoryInput" class="form-control" name="nombre" placeholder="Nombre de la nueva categoría">
+          <button class="btn btn-success" type="submit" id="addCategoryBtn">Añadir</button>
         </div>
+        </form>
         <hr>
         <h6>Categorías Existentes</h6>
         <ul class="list-group" id="categoryList">

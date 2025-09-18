@@ -1,5 +1,6 @@
 import os
 from flask import Flask, abort, render_template, redirect, url_for, flash, request
+from datetime import datetime
 from flask_bootstrap import Bootstrap5
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -43,7 +44,7 @@ class User(UserMixin, db.Model):
 class Income(UserMixin, db.Model):
     __tablename__ = 'income'
     income_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    categories_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"))
+    categories_id: Mapped[int] = mapped_column(ForeignKey("categorias.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     monto: Mapped[Float] = mapped_column(Float)
     descripcion: Mapped[str] = mapped_column(String(1000))
@@ -259,11 +260,44 @@ def ingresos():
         db.session.commit()
     return render_template("ingresos.html", logged_in=current_user.is_authenticated)
 
+@app.route('/categorias_ingresos', methods=["GET", "POST"])
+@login_required
+def categorias_ingresos():
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        if not nombre or nombre.strip() == "":
+            flash("El nombre de la categoría es requerido.", "danger")
+            return redirect(url_for('ingresos'))
+        fecha  = datetime.now()
+        tipo = "Ingreso"
+        new_category = Categorias(nombre=nombre,fecha_creacion=fecha, tipo=tipo)
+        db.session.add(new_category)
+        db.session.commit()
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated)
+
+
+
 @app.route('/egresos')
 @login_required
 def egresos():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
     return render_template("egresos.html", logged_in=current_user.is_authenticated)
+
+@app.route('/categorias_egresos', methods=["GET", "POST"])
+@login_required
+def categorias_egresos():
+    if request.method == "POST":
+        nombre = request.form.get("nombre")
+        if not nombre or nombre.strip() == "":
+            flash("El nombre de la categoría es requerido.", "danger")
+            return redirect(url_for('ingresos'))
+        fecha  = datetime.now()
+        tipo = "Egreso"
+        new_category = Categorias(nombre=nombre,fecha_creacion=fecha, tipo=tipo)
+        db.session.add(new_category)
+        db.session.commit()
+    return render_template("egresos.html", logged_in=current_user.is_authenticated)
+
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
