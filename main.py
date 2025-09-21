@@ -238,9 +238,11 @@ def delete_account():
 @app.route('/movimientos')
 @login_required
 def movimientos():
+    ingresos = db.session.execute(db.select(Income).order_by(Income.fecha_creacion)).scalars().all()
+    egresos = db.session.execute(db.select(Outcome).order_by(Outcome.fecha_creacion)).scalars().all()
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("movimientos.html", logged_in=current_user.is_authenticated)
+    return render_template("movimientos.html", logged_in=current_user.is_authenticated, ingresos=ingresos, egresos=egresos)
 
 @app.route('/metas')
 @login_required
@@ -252,7 +254,8 @@ def metas():
 @app.route('/ingresos', methods=["GET", "POST"])
 @login_required
 def ingresos():
-    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
+    categorias = db.session.execute(
+    db.select(Categorias).where(Categorias.tipo == "Ingreso").order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         user_id = current_user.id
         monto = request.form.get("monto")
@@ -270,7 +273,7 @@ def ingresos():
 @app.route('/categorias_ingresos', methods=["GET", "POST"])
 @login_required
 def categorias_ingresos():
-    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
+    categorias = db.session.execute(db.select(Categorias).where(Categorias.tipo == "Ingreso".order_by(Categorias.nombre)).scalars().all())
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":
@@ -288,7 +291,8 @@ def categorias_ingresos():
 @app.route('/egresos', methods=["GET", "POST"])
 @login_required
 def egresos():
-    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
+    categorias = db.session.execute(
+    db.select(Categorias).where(Categorias.tipo == "Egreso").order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         user_id = current_user.id
         monto = request.form.get("monto")
@@ -305,7 +309,7 @@ def egresos():
 @app.route('/categorias_egresos', methods=["GET", "POST"])
 @login_required
 def categorias_egresos():
-    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
+    categorias = db.session.execute(db.select(Categorias).where(Categorias.tipo == "Egreso").order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":

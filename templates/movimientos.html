@@ -113,33 +113,24 @@
                     </thead>
                     <tbody>
                         <!-- Ejemplo de Ingreso -->
-                        <tr data-type="ingreso" data-date="2025-08-01">
-                            <td>01/08/2025</td>
-                            <td>Salario Mensual</td>
-                            <td><span class="badge bg-success"><i class="fas fa-briefcase me-1"></i> Salario</span></td>
-                            <td class="text-end amount-income fw-bold">+$2.500.000</td>
+                        {% for ingreso in ingresos %}
+                        <tr data-type="ingreso" data-date="{{ingreso.fecha_creacion}}">
+                            <td>{{ingreso.fecha_creacion}}</td>
+                            <td>{{ingreso.descripcion}}</td>
+                            <td><span class="badge bg-success"><i></i>{{ingreso.categorias.nombre}}</span></td>
+                            <td class="text-end amount-income fw-bold">{{ingreso.monto}}</td>
                         </tr>
+                        {% endfor %}
+
                         <!-- Ejemplo de Egreso -->
-                        <tr data-type="egreso" data-date="2025-08-02">
-                            <td>02/08/2025</td>
-                            <td>Mercado del mes</td>
-                            <td><span class="badge bg-warning text-dark"><i class="fas fa-shopping-cart me-1"></i> Comida</span></td>
-                            <td class="text-end amount-expense">-$450.000</td>
+                        {% for egreso in egresos %}
+                        <tr data-type="egreso" data-date="{{egreso.fecha_creacion}}">
+                            <td>{{egreso.fecha_creacion}}</td>
+                            <td>{{egreso.descripcion}}</td>
+                            <td><span class="badge bg-danger text-light"><i></i>{{egreso.categorias.nombre}}</span></td>
+                            <td class="text-end amount-expense text-danger">-{{egreso.monto}}</td>
                         </tr>
-                        <!-- Ejemplo de Egreso -->
-                        <tr data-type="egreso" data-date="2025-08-03">
-                            <td>03/08/2025</td>
-                            <td>Factura de Internet</td>
-                            <td><span class="badge bg-info text-dark"><i class="fas fa-wifi me-1"></i> Servicios</span></td>
-                            <td class="text-end amount-expense">-$80.000</td>
-                        </tr>
-                         <!-- Ejemplo de Egreso -->
-                        <tr data-type="egreso" data-date="2025-08-04">
-                            <td>04/08/2025</td>
-                            <td>Transporte público</td>
-                            <td><span class="badge bg-secondary"><i class="fas fa-bus me-1"></i> Transporte</span></td>
-                            <td class="text-end amount-expense">-$60.000</td>
-                        </tr>
+                        {% endfor %}
                         <!-- Fila para cuando no hay resultados -->
                         <tr id="no-results-row" style="display: none;">
                             <td colspan="4" class="text-center text-muted">No se encontraron movimientos que coincidan con tu búsqueda.</td>
