@@ -1,4 +1,5 @@
 import os
+from flask import jsonify
 from flask import Flask, abort, render_template, redirect, url_for, flash, request
 from datetime import datetime
 from flask_bootstrap import Bootstrap5
@@ -40,6 +41,7 @@ class User(UserMixin, db.Model):
     outcomes: Mapped[list["Outcome"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     metas: Mapped[list["Metas"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     reportes: Mapped[list["Reportes"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    categorias: Mapped[list["Categorias"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 class Income(UserMixin, db.Model):
     __tablename__ = 'income'
@@ -79,11 +81,13 @@ class Metas(UserMixin, db.Model):
 class Categorias(UserMixin, db.Model):
     __tablename__ = 'categorias'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(1000))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    nombre: Mapped[str] = mapped_column(String(1000), unique=True)
     tipo: Mapped[str] = mapped_column(String(10))
     fecha_creacion: Mapped[str] = mapped_column(Date)
     incomes: Mapped[list["Income"]] = relationship(back_populates="categorias", cascade="all, delete-orphan")
     outcomes: Mapped[list["Outcome"]] = relationship(back_populates="categorias", cascade="all, delete-orphan")
+    user: Mapped["User"] = relationship(back_populates="categorias")
 
 class Reportes(UserMixin, db.Model):
     __tablename__ = 'reportes'
@@ -102,6 +106,7 @@ class Reportes(UserMixin, db.Model):
 
 
 with app.app_context():
+    #db.drop_all()
     db.create_all()
 
 
@@ -247,6 +252,7 @@ def metas():
 @app.route('/ingresos', methods=["GET", "POST"])
 @login_required
 def ingresos():
+    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         user_id = current_user.id
         monto = request.form.get("monto")
@@ -258,11 +264,13 @@ def ingresos():
                         categorias=categoria)
         db.session.add(new_income)
         db.session.commit()
-    return render_template("ingresos.html", logged_in=current_user.is_authenticated)
+        return redirect(url_for("movimientos"))
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
 
 @app.route('/categorias_ingresos', methods=["GET", "POST"])
 @login_required
 def categorias_ingresos():
+    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":
@@ -270,23 +278,34 @@ def categorias_ingresos():
             return redirect(url_for('ingresos'))
         fecha  = datetime.now()
         tipo = "Ingreso"
-        new_category = Categorias(nombre=nombre,fecha_creacion=fecha, tipo=tipo)
+        new_category = Categorias(user_id=current_user.id,nombre=nombre,fecha_creacion=fecha, tipo=tipo)
         db.session.add(new_category)
         db.session.commit()
-    return render_template("ingresos.html", logged_in=current_user.is_authenticated)
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
 
 
 
-@app.route('/egresos')
+@app.route('/egresos', methods=["GET", "POST"])
 @login_required
 def egresos():
-    # result = db.session.execute(db.select(BlogPost))
-    #posts = result.scalars().all()
-    return render_template("egresos.html", logged_in=current_user.is_authenticated)
-
+    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
+    if request.method == "POST":
+        user_id = current_user.id
+        monto = request.form.get("monto")
+        descripcion = request.form.get("descripcion")
+        fecha = request.form.get("fecha")
+        categoria = db.session.execute(db.select(Categorias).where(Categorias.nombre == request.form.get("categoria"))).scalar()
+        new_outcome = Outcome(user_id=user_id, monto=monto, descripcion=descripcion,
+                            fecha_creacion=fecha,
+                            categorias=categoria)
+        db.session.add(new_outcome)
+        db.session.commit()
+        return redirect(url_for("movimientos"))
+    return render_template("egresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
 @app.route('/categorias_egresos', methods=["GET", "POST"])
 @login_required
 def categorias_egresos():
+    categorias = db.session.execute(db.select(Categorias).order_by(Categorias.nombre)).scalars().all()
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":
@@ -294,10 +313,34 @@ def categorias_egresos():
             return redirect(url_for('ingresos'))
         fecha  = datetime.now()
         tipo = "Egreso"
-        new_category = Categorias(nombre=nombre,fecha_creacion=fecha, tipo=tipo)
+        new_category = Categorias(user_id=current_user.id, nombre=nombre,fecha_creacion=fecha, tipo=tipo)
         db.session.add(new_category)
         db.session.commit()
-    return render_template("egresos.html", logged_in=current_user.is_authenticated)
+    return render_template("egresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
+
+@app.route("/categorias/eliminar/<int:category_id>", methods=["DELETE"])
+@login_required
+def delete_category(category_id):
+    category_to_delete = db.session.execute(
+        db.select(Categorias).where(
+            Categorias.id == category_id,
+            Categorias.user_id == current_user.id  # Importante: Seguridad
+        )
+    ).scalar()
+
+    if not category_to_delete:
+        return jsonify(
+            {"success": False, "message": "Categoría no encontrada o no tienes permiso para eliminarla."}), 404
+
+    try:
+        db.session.delete(category_to_delete)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Categoría eliminada con éxito."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error al eliminar la categoría: {e}"}), 500
+    return redirect(url_for("home"))
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

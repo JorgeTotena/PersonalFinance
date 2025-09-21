@@ -71,47 +71,43 @@
                 <div class="col-lg-8">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <form>
+                            <form action="{{ url_for('egresos') }}" method="post" novalidate>
                                 <!-- Campo Monto -->
                                 <div class="mb-3">
                                     <label for="expenseAmount" class="form-label">Monto del Egreso</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="expenseAmount" placeholder="80000" required>
+                                        <input type="number" class="form-control" id="expenseAmount" name="monto" placeholder="80000" required>
                                     </div>
                                 </div>
 
                                 <!-- Campo Descripción -->
                                 <div class="mb-3">
                                     <label for="expenseDescription" class="form-label">Descripción</label>
-                                    <input type="text" class="form-control" id="expenseDescription" placeholder="Ej: Factura de Internet" required>
+                                    <input type="text" class="form-control" id="expenseDescription" name="descripcion" placeholder="Ej: Factura de Internet" required>
                                 </div>
 
                                 <!-- Campo Fecha -->
                                 <div class="mb-3">
                                     <label for="expenseDate" class="form-label">Fecha</label>
-                                    <input type="date" class="form-control" id="expenseDate" required>
+                                    <input type="date" class="form-control" id="expenseDate" required name="fecha">
                                 </div>
 
                                 <!-- Campo Categoría -->
-                                <div class="mb-4">
+                                   <div class="mb-4">
                                     <label for="expenseCategory" class="form-label">Categoría</label>
                                     <div class="input-group">
-                                        <select class="form-select" id="expenseCategory" required>
+                                        <select class="form-select" id="expenseCategory" required name="categoria">
                                             <option selected disabled value="">Selecciona una categoría...</option>
-                                            <option value="Comida">Comida</option>
-                                            <option value="Transporte">Transporte</option>
-                                            <option value="Servicios">Servicios</option>
-                                            <option value="Ocio">Ocio</option>
-                                            <option value="Hogar">Hogar</option>
-                                            <option value="Salud">Salud</option>
+                                            {% for categoria in categorias %}
+                                            <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
+                                            {% endfor %}
                                         </select>
                                         <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#categoryModal">
                                             <i class="fas fa-cog"></i> Gestionar
                                         </button>
                                     </div>
                                 </div>
-
                                 <button type="submit" class="btn btn-danger w-100">Guardar Egreso</button>
                             </form>
                         </div>
@@ -132,7 +128,7 @@
       </div>
       <div class="modal-body">
         <h6>Añadir Nueva Categoría</h6>
-        <form action="{{ url_for('categorias_egresos') }}" method="post" novalidate>
+        <form id="addCategoryForm" action="{{ url_for('categorias_egresos') }}" method="post" novalidate>
         <div class="input-group mb-3">
           <input type="text" id="newCategoryInput" class="form-control" name="nombre" placeholder="Nombre de la nueva categoría">
           <button class="btn btn-success" type="submit" id="addCategoryBtn">Añadir</button>
@@ -140,9 +136,17 @@
         </form>
         <hr>
         <h6>Categorías Existentes</h6>
-        <ul class="list-group" id="categoryList">
-          <!-- Las categorías se cargarán aquí con JavaScript -->
-        </ul>
+          <ul class="list-group" id="categoryList">
+              {% for categoria in categorias %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+               {{ categoria.nombre }}
+          <button class="btn btn-danger btn-sm btn-delete-category" data-category-id="{{ categoria.id }}">
+          <i class="fas fa-trash-alt"></i>
+          </button>
+  </li>
+  {% endfor %}
+</ul>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -156,3 +160,4 @@
 
 {% block footer %}
 {% endblock %}
+
