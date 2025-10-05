@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', function () {
             type: 'doughnut', // Tipo de gráfico (dona)
             data: {
                 // Etiquetas para cada sección del gráfico
-                labels: ['Comida', 'Transporte', 'Servicios', 'Ocio', 'Hogar'],
+                labels: etiquetas,
                 datasets: [{
                     label: 'Gastos del Mes',
                     // Datos de ejemplo (asegúrate que sumen el total de egresos)
-                    data: [450000, 200000, 350000, 250000, 600000],
+                    data: datos,
                     // Colores para cada sección
                     backgroundColor: [
                         '#FF6384', // Rojo

@@ -13,6 +13,13 @@
 
 
 {% block content %}
+<script>
+    const etiquetas = {{ descripciones | tojson }}; // Descripciones para el gráfico
+    const datos = {{ montos | tojson }}; // montos para el gráfico
+
+
+
+</script>
 <div class="container-fluid bg-light">
     <div class="row">
         <!-- Barra Lateral de Navegación -->
@@ -83,7 +90,7 @@
                     <div class="card shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Ingresos del Mes</h5>
-                            <p class="card-text fs-2 fw-bold">$2.500.000</p>
+                            <p class="card-text fs-2 fw-bold">${{total}}</p>
                         </div>
                     </div>
                 </div>
@@ -91,7 +98,7 @@
                     <div class="card shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-danger">Egresos del Mes</h5>
-                            <p class="card-text fs-2 fw-bold">$1.850.000</p>
+                            <p class="card-text fs-2 fw-bold">${{total_egresos}}</p>
                         </div>
                     </div>
                 </div>

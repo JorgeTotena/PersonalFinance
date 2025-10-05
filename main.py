@@ -1,12 +1,12 @@
 import os
 from flask import jsonify
 from flask import Flask, abort, render_template, redirect, url_for, flash, request
-from datetime import datetime
+from datetime import datetime, date
 from flask_bootstrap import Bootstrap5
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, Date, Float, ForeignKey
+from sqlalchemy import Integer, String, Text, Date, Float, ForeignKey, func
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__)
@@ -184,7 +184,35 @@ def logout():
 def dashboard():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
-    return render_template("dashboard.html", logged_in=current_user.is_authenticated)
+    total_ingresos = db.session.execute(db.select(func.sum(Income.monto))).scalar()
+    total_egresos = db.session.execute(db.select(func.sum(Outcome.monto))).scalar()
+    gastos_categoria = db.session.execute(
+        db.select(
+            Categorias.nombre,
+            func.sum(Outcome.monto).label('total_monto')
+        )
+        .join(Categorias)
+        .group_by(Categorias.nombre)
+        .order_by(Categorias.nombre)
+    ).all()
+    print(gastos_categoria)
+    descripciones = []
+    montos = []
+    for categoria in gastos_categoria:
+        categoria = categoria[0]
+        descripciones.append(categoria)
+    for monto in gastos_categoria:
+        monto = monto[1]
+        montos.append(monto)
+
+    print(descripciones)
+    print(montos)
+
+    if total_ingresos is None:
+        total_ingresos = 0
+    if total_egresos is None:
+        total_egresos = 0
+    return render_template("dashboard.html", logged_in=current_user.is_authenticated, total=total_ingresos, total_egresos=total_egresos, gastos_categoria=gastos_categoria, descripciones=descripciones, montos=montos)
 
 @app.route('/cuenta', methods=["GET", "POST"])
 @login_required
@@ -268,23 +296,57 @@ def ingresos():
         db.session.add(new_income)
         db.session.commit()
         return redirect(url_for("movimientos"))
-    return render_template("ingresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
+    return render_template("ingresos.html", logged_in=current_user.is_authenticated, categorias=categorias,)
 
-@app.route('/categorias_ingresos', methods=["GET", "POST"])
+
+# --- RUTA DE CATEGORÍAS DE INGRESOS (AJAX) ---
+@app.route('/categorias_ingresos', methods=["POST"])
 @login_required
 def categorias_ingresos():
-    categorias = db.session.execute(db.select(Categorias).where(Categorias.tipo == "Ingreso".order_by(Categorias.nombre)).scalars().all())
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":
-            flash("El nombre de la categoría es requerido.", "danger")
-            return redirect(url_for('ingresos'))
-        fecha  = datetime.now()
-        tipo = "Ingreso"
-        new_category = Categorias(user_id=current_user.id,nombre=nombre,fecha_creacion=fecha, tipo=tipo)
-        db.session.add(new_category)
-        db.session.commit()
-    return render_template("ingresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
+            return jsonify({"success": False, "message": "El nombre de la categoría es requerido."}), 400
+
+        try:
+            fecha_creacion = date.today()
+            tipo = "Ingreso"
+
+            # Verificar si ya existe una categoría con ese nombre para este usuario y tipo
+            existing_category = db.session.execute(
+                db.select(Categorias).where(
+                    Categorias.user_id == current_user.id,
+                    Categorias.nombre == nombre,
+                    Categorias.tipo == tipo
+                )
+            ).scalar()
+
+            if existing_category:
+                return jsonify({"success": False, "message": f"La categoría '{nombre}' ya existe para ingresos."}), 409
+
+            new_category = Categorias(
+                user_id=current_user.id,
+                nombre=nombre,
+                fecha_creacion=fecha_creacion,
+                tipo=tipo
+            )
+            db.session.add(new_category)
+            db.session.commit()
+
+            return jsonify({
+                "success": True,
+                "message": "Categoría de ingreso añadida con éxito!",
+                "category": {
+                    "id": new_category.id,
+                    "nombre": new_category.nombre,
+                    "tipo": new_category.tipo
+                }
+            }), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": f"Error al añadir la categoría de ingreso: {str(e)}"}), 500
+    return jsonify({"success": False, "message": "Método no permitido para esta operación."}), 405
 
 
 
@@ -306,21 +368,62 @@ def egresos():
         db.session.commit()
         return redirect(url_for("movimientos"))
     return render_template("egresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
-@app.route('/categorias_egresos', methods=["GET", "POST"])
+
+
+# --- RUTA DE CATEGORÍAS DE EGRESOS (AJAX) ---
+@app.route('/categorias_egresos', methods=["POST"])  # Solo POST para añadir via AJAX
 @login_required
 def categorias_egresos():
-    categorias = db.session.execute(db.select(Categorias).where(Categorias.tipo == "Egreso").order_by(Categorias.nombre)).scalars().all()
+    # No necesitamos lógica GET aquí si esta ruta es solo para el modal AJAX POST.
+    # Si quieres que /categorias_egresos cargue una página, haz otra ruta o maneja el GET.
     if request.method == "POST":
         nombre = request.form.get("nombre")
         if not nombre or nombre.strip() == "":
-            flash("El nombre de la categoría es requerido.", "danger")
-            return redirect(url_for('ingresos'))
-        fecha  = datetime.now()
-        tipo = "Egreso"
-        new_category = Categorias(user_id=current_user.id, nombre=nombre,fecha_creacion=fecha, tipo=tipo)
-        db.session.add(new_category)
-        db.session.commit()
-    return render_template("egresos.html", logged_in=current_user.is_authenticated, categorias=categorias)
+            return jsonify({"success": False, "message": "El nombre de la categoría es requerido."}), 400
+
+        try:
+            fecha_creacion = date.today()  # Usar date.today() para Mapped[Date]
+            tipo = "Egreso"
+
+            # Verificar si ya existe una categoría con ese nombre para este usuario y tipo
+            existing_category = db.session.execute(
+                db.select(Categorias).where(
+                    Categorias.user_id == current_user.id,
+                    Categorias.nombre == nombre,
+                    Categorias.tipo == tipo
+                )
+            ).scalar()
+
+            if existing_category:
+                return jsonify({"success": False, "message": f"La categoría '{nombre}' ya existe para egresos."}), 409
+
+            new_category = Categorias(
+                user_id=current_user.id,
+                nombre=nombre,
+                fecha_creacion=fecha_creacion,
+                tipo=tipo
+            )
+            db.session.add(new_category)
+            db.session.commit()
+
+            return jsonify({
+                "success": True,
+                "message": "Categoría de egreso añadida con éxito!",
+                "category": {
+                    "id": new_category.id,
+                    "nombre": new_category.nombre,
+                    "tipo": new_category.tipo
+                }
+            }), 201  # Created
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": f"Error al añadir la categoría de egreso: {str(e)}"}), 500
+
+    # Esta ruta NO DEBERÍA SER LLAMADA con GET por el modal.
+    # Si esta ruta es solo para AJAX, considera eliminar el 'GET' de methods=["GET", "POST"]
+    # y si alguien accede directamente con GET, podrías devolver un error 405.
+    return jsonify({"success": False, "message": "Método no permitido para esta operación."}), 405
 
 @app.route("/categorias/eliminar/<int:category_id>", methods=["DELETE"])
 @login_required
