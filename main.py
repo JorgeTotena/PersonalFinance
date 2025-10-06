@@ -1,6 +1,5 @@
 import os
-from flask import jsonify
-from flask import Flask, abort, render_template, redirect, url_for, flash, request
+from flask import Flask, abort, render_template, redirect, url_for, flash, request, jsonify
 from datetime import datetime, date
 from flask_bootstrap import Bootstrap5
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -278,6 +277,108 @@ def metas():
     # result = db.session.execute(db.select(BlogPost))
     #posts = result.scalars().all()
     return render_template("metas.html", logged_in=current_user.is_authenticated)
+
+@app.route('/nueva_meta', methods=["GET", "POST"])
+@login_required
+def nueva_meta():
+    if request.method == "POST":
+        user_id = current_user.id
+        descripcion = request.form.get("descripcion")
+        monto_final_str = request.form.get("ahorro_potencial")
+        monto_actual_str = request.form.get("ahorro_real")
+        fecha_creacion_str = request.form.get("fecha_creacion")
+        fecha_programada_str = request.form.get("fecha_programada")
+
+        # --- Validaciones de campos (IMPORTANTE: devolver jsonify en errores) ---
+        if not descripcion or not monto_final_str or not monto_actual_str or not fecha_creacion_str or not fecha_programada_str:
+            return jsonify({"success": False, "message": "Todos los campos son obligatorios."}), 400
+
+        try:
+            monto_final = float(monto_final_str)
+            monto_actual = float(monto_actual_str)
+            if monto_final <= 0:
+                return jsonify({"success": False, "message": "El monto objetivo debe ser positivo."}), 400
+            if monto_actual < 0:
+                return jsonify({"success": False, "message": "El ahorro actual no puede ser negativo."}), 400
+            if monto_actual > monto_final:
+                return jsonify({"success": False, "message": "El ahorro actual no puede ser mayor que el monto objetivo."}), 400
+
+            fecha_creacion = datetime.strptime(fecha_creacion_str, '%Y-%m-%d').date()
+            fecha_programada = datetime.strptime(fecha_programada_str, '%Y-%m-%d').date()
+
+            if fecha_programada < fecha_creacion:
+                return jsonify({"success": False, "message": "La fecha límite no puede ser anterior a la fecha de creación."}), 400
+
+        except (ValueError, TypeError):
+            return jsonify({"success": False, "message": "Formato de monto o fecha inválido."}), 400
+
+        # --- Lógica de límite de metas (si aplica, también con jsonify) ---
+        # Ejemplo: Si tienes un límite de 3 metas para el plan gratuito
+        limite_metas_gratuitas = 3
+        current_metas = db.session.execute(
+            db.select(Metas).where(Metas.user_id == current_user.id)
+        ).scalars().all()
+        current_metas_count = len(current_metas)
+        if current_metas_count >= limite_metas_gratuitas:
+            return jsonify({"success": False, "message": f"Has alcanzado el límite de {limite_metas_gratuitas} metas. Pásate a Premium para crear metas ilimitadas!"}), 403 # 403 Forbidden
+
+        # --- Si todo es válido, crear y guardar la meta ---
+        try:
+            new_meta = Metas(
+                user_id=user_id,
+                descripcion=descripcion,
+                fecha_creacion=fecha_creacion,
+                fecha_programada=fecha_programada,
+                ahorro_actual=monto_actual,
+                ahorro_potencial=monto_final
+            )
+            db.session.add(new_meta)
+            db.session.commit()
+            return jsonify({
+                "success": True,
+                "message": "Meta agregada con éxito!",
+                "category": { # 'category' es un nombre un poco confuso aquí, podrías usar 'meta'
+                    "id": new_meta.meta_id,
+                    "nombre": new_meta.descripcion,
+                    "fecha_programada": new_meta.fecha_programada.strftime('%Y-%m-%d') # Formatear para JSON
+                }
+            }), 201 # 201 Created
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": f"Error interno al guardar la meta: {str(e)}"}), 500
+
+    return render_template("nueva_meta.html", logged_in=current_user.is_authenticated)
+
+
+
+# @app.route('/nueva_meta', methods=["GET", "POST"])
+# @login_required
+# def nueva_meta():
+#     # result = db.session.execute(db.select(BlogPost))
+#     #posts = result.scalars().all()
+#     if request.method == "POST":
+#         user_id = current_user.id
+#         descripcion = request.form.get("descripcion")
+#         monto_final = request.form.get("ahorro_potencial")
+#         monto_actual = request.form.get("ahorro_real")
+#         fecha = request.form.get("fecha_creacion")
+#         fecha_programada = request.form.get("fecha_programada")
+#         new_meta = Metas(user_id=user_id,descripcion=descripcion, fecha_creacion=fecha, fecha_programada=fecha_programada,
+#                          ahorro_actual=monto_actual, ahorro_potencial=monto_final)
+#         db.session.add(new_meta)
+#         db.session.commit()
+#         return jsonify({
+#             "success": True,
+#             "message": "Meta agregada con exito!",
+#             "category": {
+#                 "id": new_meta.meta_id,
+#                 "nombre": new_meta.descripcion,
+#                 "fecha programada": new_meta.fecha_programada
+#             }
+#         }), 201
+#     return render_template("nueva_meta.html", logged_in=current_user.is_authenticated)
+#
+
 
 @app.route('/ingresos', methods=["GET", "POST"])
 @login_required
